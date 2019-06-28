@@ -1,0 +1,109 @@
+register.jsp
+
+<form action="RegisterServlet" method="post">
+		<h1>Registration</h1>
+<hr>
+<table>
+<tr><td>Login name</td><td><input type="text" name="name"></td></tr>
+<tr><td>Password</td><td><input type="password" name="pass"></td></tr>
+<tr><td>Age</td><td><input type="text" name="age"></td></tr>
+<tr><td>City</td><td><input type="text" name="city"></td></tr>
+<tr><td></td><td><input type="submit" value="submit"></td></tr>
+</table>
+</form>
+................................................
+registerservlet.java
+
+try
+	{
+	RegisterBean register=new RegisterBean();
+		register.setLoginname(request.getParameter("name"));
+		register.setPassword(request.getParameter("pass"));
+		register.setAge(Integer.parseInt(request.getParameter("age")));
+		register.setCity(request.getParameter("city"));
+		boolean res=new HibernateDAO().register(register);
+		if(res){
+			RequestDispatcher rd=request.getRequestDispatcher("Success.html");
+			rd.forward(request, response);
+		}else{
+			RequestDispatcher rd=request.getRequestDispatcher("error.html");
+			rd.forward(request, response);
+		}
+	}
+	catch(Exception e)
+	{
+		e.getMessage();
+	}
+................................................................................
+hibernatedao.java
+
+public boolean register(RegisterBean rbean)
+			{
+				 SessionFactory sx=new AnnotationConfiguration().configure().addAnnotatedClass(RegisterBean.class).buildSessionFactory();
+				 Session s=sx.openSession();
+				 Transaction tx=null;
+				 try{
+				 tx=s.beginTransaction();
+				 s.save(rbean);
+				 tx.commit();
+				 System.out.println("Data saved...");
+				 }catch(HibernateException e){
+					 if(tx!=null) 
+						 tx.rollback();
+					 e.printStackTrace();
+				 }finally{
+					 s.close();
+				 }
+				return true;
+/////////////////////////////////////////////////////////////////////////////////////////////
+regbean.java
+
+package com.dsrc.work;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="Register")
+public class RegisterBean {
+	@Id
+	@Column(name="loginname")
+	private String loginname;
+	@Column(name="password")
+
+	private String password;
+	@Column(name="age")
+
+	private int age;
+	@Column(name="city")
+
+	private String City;
+	public String getLoginname() {
+		return loginname;
+	}
+	public void setLoginname(String loginname) {
+		this.loginname = loginname;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public String getCity() {
+		return City;
+	}
+	public void setCity(String city) {
+		City = city;
+	}
+	
+}
+........................................................................
